@@ -214,3 +214,7 @@ Cada repetición parte del mismo esqueleto y vuelve a implementar el adaptador H
 El historial de Git conserva los commits de cada repetición. Las versiones están identificadas mediante los tags `kata4-r1`, `kata4-r2` y `kata4-r3`.
 
 La rama `main` contiene la versión final de la entrega.
+
+## Vídeo explicativo
+
+[Ver la demostración de la Kata 4](https://youtu.be/e9VulWqyGQA)
