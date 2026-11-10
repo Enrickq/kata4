@@ -15,7 +15,8 @@ public final class Main {
     private static final String DEFAULT_BASE_URL = "http://localhost:8081";
 
     public static void main(String[] args) {
-        run(args);
+        int status = run(args);
+        if (status != 0) System.exit(status);
     }
 
     static int run(String[] args) {

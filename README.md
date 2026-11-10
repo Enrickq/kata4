@@ -144,15 +144,25 @@ También se puede ejecutar `Main` desde IntelliJ IDEA, indicando los argumentos 
 
 El cliente distingue entre errores de conexión, respuestas HTTP de error y respuestas con un formato incorrecto.
 
-El servidor auxiliar permite reproducir estos casos.
+El servidor auxiliar permite reproducir estos casos con dos terminales abiertas en la raíz del proyecto: una para el servidor y otra para el cliente.
+
+Los tres modos siguientes utilizan el puerto `8082`. Antes de cambiar de modo, detén la instancia anterior pulsando `Ctrl+C` en la terminal del servidor. Inicia después el nuevo modo y ejecuta el cliente en la otra terminal.
 
 **Servicio no disponible (HTTP 503)**
+
+En la terminal del servidor:
 
 ```bash
 java tools/FibonacciDemoServer.java 8082 error
 ```
 
-Ejecutando el cliente contra `http://localhost:8082` se obtiene:
+En la terminal del cliente:
+
+```bash
+mvn compile exec:java "-Dexec.args=8 http://localhost:8082"
+```
+
+Mensaje esperado:
 
 ```text
 El servicio respondió con HTTP 503.
@@ -160,25 +170,59 @@ El servicio respondió con HTTP 503.
 
 **Respuesta JSON incorrecta**
 
+Detén el servidor anterior con `Ctrl+C` y arráncalo en este modo:
+
 ```bash
 java tools/FibonacciDemoServer.java 8082 malformed
 ```
 
-El cliente detecta que la respuesta no tiene un formato válido.
+En la terminal del cliente:
+
+```bash
+mvn compile exec:java "-Dexec.args=8 http://localhost:8082"
+```
+
+Mensaje esperado:
+
+```text
+El servicio devolvió una respuesta vacía o con JSON no válido.
+```
 
 **Respuesta vacía**
+
+Detén el servidor anterior con `Ctrl+C` y arráncalo en este modo:
 
 ```bash
 java tools/FibonacciDemoServer.java 8082 empty
 ```
 
-El cliente identifica la respuesta vacía como inválida.
+En la terminal del cliente:
+
+```bash
+mvn compile exec:java "-Dexec.args=8 http://localhost:8082"
+```
+
+Mensaje esperado:
+
+```text
+El servicio devolvió una respuesta vacía o con JSON no válido.
+```
 
 **Error de conexión**
 
-También se puede probar el cliente contra un puerto sin ningún servidor en ejecución. En ese caso se informa de que no ha sido posible establecer la conexión.
+Detén el servidor de prueba con `Ctrl+C` y deja el puerto `8082` sin ningún servidor escuchando. Ejecuta el cliente contra ese puerto:
 
-Para cada prueba se utiliza una instancia del servidor con el modo correspondiente.
+```bash
+mvn compile exec:java "-Dexec.args=8 http://localhost:8082"
+```
+
+Mensaje esperado:
+
+```text
+No se puede conectar con el servicio. Revisa que esté iniciado y la URL base.
+```
+
+El cliente termina con código de proceso `1` en estos casos de error y con `0` cuando obtiene un resultado correcto.
 
 ## Pruebas
 
@@ -198,6 +242,12 @@ Se comprueban los siguientes comportamientos:
 - Formato de presentación de resultados y errores.
 
 Las pruebas del cliente HTTP utilizan un servidor local de prueba y no requieren que el servidor de demostración esté iniciado.
+
+## Revisión posterior al vídeo
+
+Después de grabar el vídeo se reforzó la validación de las respuestas: el parser exige JSON estricto y convierte los errores de formato numérico en una respuesta inválida controlada. También se corrigió la propagación del resultado de `Main` al proceso, que devuelve `1` ante un fallo y `0` en una ejecución correcta.
+
+La revisión incorpora pruebas de regresión para estas situaciones, incluida la ejecución de `Main` como proceso independiente. La validación actual ejecuta 21 pruebas sin fallos, mediante el mismo comando `mvn clean test`.
 
 ## Repeticiones
 
